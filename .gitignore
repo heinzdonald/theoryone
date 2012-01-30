@@ -1,0 +1,8 @@
+sites/default/files/*
+*.sql
+*.mysql
+settings.php
+sites/default/settings.php
+sites/*/settings/php
+sites/default/default.settings.php
+php_error
