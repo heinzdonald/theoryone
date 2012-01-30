@@ -1,0 +1,10 @@
+name = Resource Conflict
+description = Provides a mechanism for notifying of conflict based on nodereferenced resources.
+dependencies[] = node_reference
+dependencies[] = date_api
+project = "resource_conflict"
+core = 7.x
+
+
+files[] = resource_conflict.install
+files[] = resource_conflict.module

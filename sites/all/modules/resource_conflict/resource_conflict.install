@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the resource_conflict module.
+ *
+ */
+
+// $Id
+
+/**
+ * Implements hook_uninstall().
+ */
+function resource_conflict_uninstall() {
+     _resource_conflict_variable_delete_like('rc_type_%');
+     _resource_conflict_variable_delete_like('rc_date_field_%');
+     _resource_conflict_variable_delete_like('rc_reference_fields_%');
+
+     variable_del('rc_types');
+   }
+
+   /**
+    * Delete all variables matching a pattern using SQL 'LIKE' syntax.
+    * @param $pattern
+    *   The pattern of variables to delete.
+    */
+   function _resource_conflict_variable_delete_like($pattern) {
+     $q = "SELECT name FROM {variable} WHERE name LIKE :pattern";
+     // TODO Please convert this statement to the D7 database API syntax.
+     $result = db_query("SELECT name FROM {variable} WHERE name LIKE :pattern", array(':pattern' => $pattern));
+     foreach ($result as $record) {
+       variable_del($record->name);
+       // Perform operations on $record->title, etc. here.
+       // in this example the available data would be mapped to object properties:
+       // $record->nid, $record->title, $record->created
+     }
+   }
