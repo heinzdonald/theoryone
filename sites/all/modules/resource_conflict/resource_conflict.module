@@ -153,27 +153,32 @@ function resource_conflict_form_alter(&$form, $form_state, $form_id) {
 
     $date_fields = array();
     if ($type != NULL) {
-         //$fields = field_info_instances('node',$type);
-         $fields = field_info_instances('node', $type);
-				 //print_r($fields);
-         foreach ($fields as $fieldname => $field) {
-           if ($field['display']['default']['module'] == 'node_reference') {
-             $nodereference_fields[$fieldname] = $field['label']; //$field['widget']['label'];
-           } 
-					 elseif (($field['display']['default']['module'] == 'date')&&($field['required'] == 1)){
-             $fieldinfo = field_info_field($fieldname);
-             if ($fieldinfo['settings']['todate'] == 'required' ) {
-                $date_fields[$fieldname] = $field['label'];
-             }
-           }
-         }
+			//$fields = field_info_instances('node',$type);
+			$fields = field_info_instances('node', $type);
+			//print_r($fields);
+			foreach ($fields as $fieldname => $field) {
+				//print $fieldname;
+				$field_info = field_info_field($fieldname);
+				//if ($field_info['display']['default']['module'] == 'node_reference') {
+				if ($field_info['module'] == 'node_reference') {
+					$nodereference_fields[$fieldname] = $field['label']; //$field['widget']['label'];
+				} 
+				//elseif (($field['display']['default']['module'] == 'date') && ($field['required'] == 1)) {
+				elseif (($field_info['module'] == 'date') && ($field['required'] == 1)){
+					//$fieldinfo = field_info_field($fieldname);
+					if ($field_info['settings']['todate'] == 'required' ) {
+						$date_fields[$fieldname] = $field['label'];
+					}
+				}
+			}
     }
 
     if (empty($nodereference_fields)) {
       $requirements['nodereference'] = t('At least one Node Reference field must be added to this content type.');
     }
 
-    if (module_exists('event')) {
+    /*
+		if (module_exists('event')) {
       $event_enabled = (event_enabled_state($type) == "all" || event_enabled_state($type) == "solo");
     }
     else {
@@ -184,16 +189,20 @@ function resource_conflict_form_alter(&$form, $form_state, $form_id) {
     if ($event_enabled) {
       $date_fields += array('event' => t('Use Event Field from the Event Module'));
     }
+		*/
 
-    if (empty($date_fields) && !$event_enabled) {
-      if (module_exists('event')) {
+    if (empty($date_fields)/* && !$event_enabled*/) {
+      /*
+			if (module_exists('event')) {
         $requirements['event'] = t('If you wish to use Resource Conflict with the Event module, please event-enable this content type.');
       }
       else {
         $requirements['event'] = t('If you wish to use Resource Conflict with the Event module, please install the Event module and make sure that this content type is event-enabled.');
       }
+			*/
 
-      $requirements['date_api'] = t('If you wish to use Resource Conflict with the Date module, this content type does not contain any suitable Date fields. If you\'ve added a Date field for this purpose, please make sure it is a *required* field. You must also make sure that the end date in this field is required.');
+      $requirements['date_api'] = t('This content type does not contain any suitable Date fields. If you\'ve added a Date field for this purpose, please make sure it is a *required* field. You must also make sure that the end date in this field is required.');
+      //$requirements['date_api'] = t('If you wish to use Resource Conflict with the Date module, this content type does not contain any suitable Date fields. If you\'ve added a Date field for this purpose, please make sure it is a *required* field. You must also make sure that the end date in this field is required.');
     }
 
     if (!empty($requirements)) {
@@ -251,7 +260,7 @@ function resource_conflict_form_alter(&$form, $form_state, $form_id) {
  */
 function resource_conflict_form_validate($form, &$form_state) {
   if ($form_state['values']['form_id'] == 'node_type_form') {
-    if (isset($form_state['values']['rc_type'])&&$form_state['values']['rc_type']) {
+    if (isset($form_state['values']['rc_type']) && $form_state['values']['rc_type']) {
       $resource_selected = FALSE;
       foreach ($form_state['values']['rc_reference_fields'] as $field) {
         if ($field) {
